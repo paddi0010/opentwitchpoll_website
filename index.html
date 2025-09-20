@@ -4,62 +4,145 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenTwitchPoll</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>OpenTwitchPoll</h1>
-      <nav>
-        <a href="#features">Features</a>
-        <a href="#about">Über</a>
-        <a href="#contact">Kontakt</a>
-      </nav>
+  <!-- Hintergrund -->
+  <canvas id="particle-canvas"></canvas>
+  <div class="neon-lines"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">OpenTwitchPoll</div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Startseite</a>
+      <a href="contact.html" class="nav-link">Kontakt</a>
+    </nav>
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
   </header>
 
+  <!-- Hero -->
   <section class="hero">
-    <div class="container">
-      <h2>Das Tool, das dein Leben einfacher macht</h2>
-      <p>Hier kurz beschreiben, was dein Tool kann.</p>
-      <button onclick="alert('Danke für dein Interesse!')">Mehr erfahren</button>
-    </div>
+    <h1 id="typed"></h1>
+    <p class="subtitle">Das Tool, das Non-Affiliates das Leben erleichtert.</p>
+    <button class="btn">Zum GitHub Repository</button>
   </section>
 
-  <section id="features" class="features container">
+  <!-- Features -->
+  <section class="features" id="features">
     <h2>Features</h2>
-    <div class="feature-list">
-      <div class="feature">
-        <h3>Schnell</h3>
-        <p>Unser Tool läuft schnell und zuverlässig.</p>
+    <div class="feature-cards">
+      <div class="card">
+        <h3>Echtzeit-Poll</h3>
+        <p>Verfolge Abstimmungen direkt im Stream in Echtzeit.</p>
       </div>
-      <div class="feature">
+      <div class="card">
         <h3>Einfache Bedienung</h3>
-        <p>Intuitives Interface für jeden Nutzer.</p>
+        <p>Leicht verständliches Interface für Non-Affiliates.</p>
       </div>
-      <div class="feature">
-        <h3>Kostenlos</h3>
-        <p>Du kannst das Tool ohne Gebühren verwenden.</p>
+      <div class="card">
+        <h3>Anpassbar</h3>
+        <p>Passe Farben, Layout und Optionen nach deinem Geschmack an.</p>
       </div>
     </div>
   </section>
 
-  <section id="about" class="about container">
-    <h2>Über das Tool</h2>
-    <p>Hier kannst du deine Geschichte oder Motivation für das Tool schreiben.</p>
-  </section>
-
-  <section id="contact" class="contact container">
-    <h2>Kontakt</h2>
-    <p>Schreibe uns eine Mail: <a href="mailto:deine@email.de">deine@email.de</a></p>
-  </section>
-
+  <!-- Footer -->
   <footer>
-    <div class="container">
-      <p>© 2025 Mein Tool</p>
-    </div>
+    <p>© 2025 OpenTwitchPoll</p>
   </footer>
 
+  <!-- JS -->
   <script src="js/script.js"></script>
+  <script>
+    // Typing Effect für Hero-Titel
+    const typed = document.getElementById("typed");
+    const titleText = "OpenTwitchPoll";
+    let charIndex = 0;
+
+    function typeTitle() {
+      if(charIndex < titleText.length) {
+        typed.innerHTML += titleText.charAt(charIndex);
+        charIndex++;
+        setTimeout(typeTitle, 100);
+      }
+    }
+    typeTitle();
+
+    // Hamburger & aktiver Link
+    const hamburger = document.querySelector(".hamburger");
+    const navLinks = document.querySelector(".nav-links");
+
+    hamburger.addEventListener("click", () => {
+      navLinks.classList.toggle("show");
+    });
+
+    const links = document.querySelectorAll(".nav-link");
+    const currentPath = window.location.pathname.split("/").pop();
+
+    links.forEach(link => {
+      const linkPath = link.getAttribute("href");
+      if(linkPath === currentPath || (linkPath === "index.html" && currentPath === "")) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
+
+    // Partikel-Hintergrund
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    const particleCount = 80;
+
+    for(let i=0;i<particleCount;i++){
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random()*2+1,
+        dx: (Math.random()-0.5)*0.5,
+        dy: (Math.random()-0.5)*0.5
+      });
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2,false);
+        ctx.fillStyle = 'rgba(145,70,255,0.3)';
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // Parallax für Neon-Lines
+    const neonLines = document.querySelector('.neon-lines');
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      neonLines.style.transform = `translateY(${scrollY * 0.2}px)`;
+      particles.forEach((p, i) => {
+        p.y += (scrollY * 0.001) * (i % 2 === 0 ? 1 : -1);
+      });
+    });
+  </script>
 </body>
 </html>
